@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Keyboard,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -32,14 +33,16 @@ export default function HomeScreen() {
       const response = await fetch(apiUrl);
       const data = await response.json();
 
-      const formattedResults = data.items?.map((item) => ({
-        title: item.title,
-        snippet: item.snippet,
-        thumbnail: item.pagemap?.cse_image?.[0]?.src || 'https://via.placeholder.com/64',
-      })) || [];
+      const formattedResults =
+        data.items?.map((item) => ({
+          title: item.title,
+          snippet: item.snippet,
+          thumbnail:
+            item.pagemap?.cse_image?.[0]?.src ||
+            'https://via.placeholder.com/64',
+        })) || [];
 
       setResults(formattedResults);
-
       navigation.navigate('SearchResults', { results: formattedResults });
     } catch (error) {
       console.error('Search error:', error);
@@ -47,13 +50,24 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
-      <Text style={styles.header}>Welcome to TUEBO!</Text>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Image
+        source={require('../../assets/mascot-search.png')}
+        style={styles.mascot}
+        resizeMode="contain"
+      />
+
+      <Text style={styles.header}>Welcome to TUEBO! 🧠✨</Text>
       <Text style={styles.subheader}>Safe Learning Search for Kids</Text>
 
       <View style={styles.inputRow}>
         <TextInput
           placeholder="Type a question..."
+          placeholderTextColor="#aaa"
           value={searchQuery}
           onChangeText={setSearchQuery}
           style={styles.input}
@@ -67,32 +81,51 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#FFFDE6',
+  },
+  content: {
+    alignItems: 'center',
+    padding: 24,
+  },
+  mascot: {
+    width: 220,
+    height: 220,
+    marginBottom: 20,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
-    marginTop: 12,
+    marginBottom: 6,
+    textAlign: 'center',
   },
   subheader: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 20,
+    marginBottom: 24,
+    textAlign: 'center',
   },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    width: '100%',
   },
   input: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 25, // 🔵 Rounded!
     fontSize: 16,
     marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+
+    // ✨ Shadow!
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3, // Android
   },
 });
