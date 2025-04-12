@@ -56,7 +56,7 @@ export default function HomeScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <Image
-        source={require('../../assets/mascot-search.png')}
+        source={require('../../assets/splash.png')}
         style={styles.mascot}
         resizeMode="contain"
       />
@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
     padding: 24,
+    paddingTop: 80, // 👈 This moves everything down a bit!
   },
   mascot: {
     width: 220,
@@ -115,17 +116,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 25, // 🔵 Rounded!
+    borderRadius: 25,
     fontSize: 16,
     marginRight: 8,
     borderWidth: 1,
     borderColor: '#ccc',
-
-    // ✨ Shadow!
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3, // Android
+    elevation: 3,
   },
 });
