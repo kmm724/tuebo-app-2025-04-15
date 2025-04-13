@@ -38,7 +38,7 @@ const HistoryScreen = ({ history: initialHistory }) => {
         />
       )}
       <TouchableOpacity style={styles.homeButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.homeButtonText}>🔙 Back to Parent Tools</Text>
+        <Text style={styles.homeButtonText}>🔙 Back</Text>
       </TouchableOpacity>
     </View>
   );
