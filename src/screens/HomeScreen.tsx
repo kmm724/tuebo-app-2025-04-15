@@ -1,3 +1,4 @@
+// HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -34,8 +35,6 @@ export default function HomeScreen() {
       console.error('Failed to save search history:', error);
     }
 
-    Keyboard.dismiss();
-
     const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(
       searchQuery
     )}`;
@@ -55,8 +54,11 @@ export default function HomeScreen() {
 
       setResults(formattedResults);
       navigation.navigate('SearchResults', { results: formattedResults });
+      setSearchQuery('');
     } catch (error) {
       console.error('Search error:', error);
+    } finally {
+      Keyboard.dismiss();
     }
   };
 
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
     padding: 24,
-    paddingTop: 80, // 👈 This moves everything down a bit!
+    paddingTop: 80,
   },
   mascot: {
     width: 220,
