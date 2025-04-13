@@ -16,12 +16,23 @@ const API_KEY = 'AIzaSyB84VMq1SlOqk2Ul3hL8jjtXW5nR54cRXo';
 const SEARCH_ENGINE_ID = 'f73c36ac849f74759';
 
 export default function HomeScreen() {
+  console.log("HomeScreen loaded successfully");
+
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
+
+    try {
+      const existing = await AsyncStorage.getItem('searchHistory');
+      const parsed = existing ? JSON.parse(existing) : [];
+      const newHistory = [{ term: searchQuery }, ...parsed].slice(0, 10);
+      await AsyncStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    } catch (error) {
+      console.error('Failed to save search history:', error);
+    }
 
     Keyboard.dismiss();
 
@@ -49,33 +60,42 @@ export default function HomeScreen() {
     }
   };
 
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
-    >
-      <Image
-        source={require('../../assets/splash.png')}
-        style={styles.mascot}
-        resizeMode="contain"
-      />
-
-      <Text style={styles.header}>Welcome to TUEBO! 🧠✨</Text>
-      <Text style={styles.subheader}>Safe Learning Search for Kids</Text>
-
-      <View style={styles.inputRow}>
-        <TextInput
-          placeholder="Type a question..."
-          placeholderTextColor="#aaa"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          style={styles.input}
+  try {
+    return (
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Image
+          source={require('../../assets/splash.png')}
+          style={styles.mascot}
+          resizeMode="contain"
         />
-        <Button title="Search" onPress={handleSearch} />
+
+        <Text style={styles.header}>Welcome to TUEBO! 🧠✨</Text>
+        <Text style={styles.subheader}>Safe Learning Search for Kids</Text>
+
+        <View style={styles.inputRow}>
+          <TextInput
+            placeholder="Type a question..."
+            placeholderTextColor="#aaa"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={styles.input}
+          />
+          <Button title="Search" onPress={handleSearch} />
+        </View>
+      </ScrollView>
+    );
+  } catch (error) {
+    console.error("HomeScreen error:", error);
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: 'red', fontSize: 18 }}>Oops! Something went wrong.</Text>
       </View>
-    </ScrollView>
-  );
+    );
+  }
 }
 
 const styles = StyleSheet.create({

@@ -21,7 +21,8 @@ export default function VideoSearchScreen() {
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
-    Keyboard.dismiss();
+
+    console.log('Running video search for:', searchQuery); // debug line
 
     try {
       // Save search term to history
@@ -47,31 +48,35 @@ export default function VideoSearchScreen() {
         return;
       }
 
-      const ytVideos = ytData.items.map((item) => {
-        const videoId = item.id?.videoId;
-        const title = item.snippet?.title;
-        const thumbnail = item.snippet?.thumbnails?.high?.url;
+      const ytVideos = ytData.items
+        .map((item) => {
+          const videoId = item.id?.videoId;
+          const title = item.snippet?.title;
+          const thumbnail = item.snippet?.thumbnails?.high?.url;
 
-        if (videoId && title && thumbnail) {
-          return {
-            title,
-            link: `https://www.youtube.com/watch?v=${videoId}`,
-            thumbnail,
-          };
-        } else {
-          return null;
-        }
-      }).filter(Boolean);
+          if (videoId && title && thumbnail) {
+            return {
+              title,
+              link: `https://www.youtube.com/watch?v=${videoId}`,
+              thumbnail,
+            };
+          } else {
+            return null;
+          }
+        })
+        .filter(Boolean);
 
       setVideos(ytVideos);
     } catch (err) {
       console.error('Video search error', err);
       setVideos([]);
+    } finally {
+      Keyboard.dismiss(); // moved here to prevent early dismissal
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <Text style={styles.header}>🎥 Video Search</Text>
       <TextInput
         style={styles.input}
