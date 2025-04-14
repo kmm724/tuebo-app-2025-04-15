@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   TextInput,
   Button,
   StyleSheet,
@@ -70,13 +69,10 @@ export default function HomeScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Image
-          source={require('../../assets/splash.png')}
+          source={require('../../assets/mascot-search.png')}
           style={styles.mascot}
           resizeMode="contain"
         />
-
-        <Text style={styles.header}>Welcome to TUEBO! 🧠✨</Text>
-        <Text style={styles.subheader}>Safe Learning Search for Kids</Text>
 
         <View style={styles.inputRow}>
           <TextInput
@@ -113,20 +109,7 @@ const styles = StyleSheet.create({
   mascot: {
     width: 220,
     height: 220,
-    marginBottom: 20,
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  subheader: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
-    textAlign: 'center',
+    marginBottom: 30,
   },
   inputRow: {
     flexDirection: 'row',
