@@ -92,7 +92,7 @@ export default function VideoSearchScreen() {
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
-      <Button title="Search Videos" onPress={handleSearch} color="#ff6f61" />
+      <Button title="Search Videos" onPress={handleSearch} color="#1d3557" />
 
       {videos.map((video, index) => (
         <View key={index} style={styles.videoCard}>

@@ -99,7 +99,7 @@ export default function ParentToolsScreen() {
           secureTextEntry
           maxLength={4}
         />
-        <Button title="Unlock" onPress={handlePinSubmit} color="#ff8800" />
+        <Button title="Unlock" onPress={handlePinSubmit} color="#1d3557" />
       </View>
     );
   }
