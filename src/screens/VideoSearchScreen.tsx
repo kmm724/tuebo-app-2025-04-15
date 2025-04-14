@@ -89,7 +89,9 @@ export default function VideoSearchScreen() {
       {videos.map((video, index) => (
         <View key={index} style={styles.videoCard}>
           {video.thumbnail ? (
-            <Image source={{ uri: video.thumbnail }} style={styles.videoThumb} />
+            <Pressable onPress={() => Linking.openURL(video.link)}>
+              <Image source={{ uri: video.thumbnail }} style={styles.videoThumb} />
+            </Pressable>
           ) : null}
           <Text style={styles.videoTitle}>{video.title}</Text>
           <Pressable onPress={() => Linking.openURL(video.link)} style={styles.resultLink}>
