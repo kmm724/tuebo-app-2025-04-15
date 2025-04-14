@@ -1,14 +1,13 @@
-// HomeScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
+  Text,
   TextInput,
   Button,
   StyleSheet,
   ScrollView,
   Keyboard,
   Image,
-  TouchableOpacity,
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,8 +17,6 @@ const API_KEY = 'AIzaSyB84VMq1SlOqk2Ul3hL8jjtXW5nR54cRXo';
 const SEARCH_ENGINE_ID = 'f73c36ac849f74759';
 
 export default function HomeScreen() {
-  console.log("HomeScreen loaded successfully");
-
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -28,30 +25,32 @@ export default function HomeScreen() {
     if (!searchQuery.trim()) return;
 
     try {
+      const blocked = await AsyncStorage.getItem('blockedTerms');
+      const blockedTerms = blocked ? JSON.parse(blocked) : [];
+      const loweredQuery = searchQuery.toLowerCase();
+      const isBlocked = blockedTerms.some(term => loweredQuery.includes(term));
+
+      if (isBlocked) {
+        Alert.alert('Blocked Search', 'This search contains a blocked keyword.');
+        return;
+      }
+
       const existing = await AsyncStorage.getItem('searchHistory');
       const parsed = existing ? JSON.parse(existing) : [];
       const newHistory = [{ term: searchQuery }, ...parsed].slice(0, 10);
       await AsyncStorage.setItem('searchHistory', JSON.stringify(newHistory));
-    } catch (error) {
-      console.error('Failed to save search history:', error);
-    }
 
-    const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(
-      searchQuery
-    )}`;
+      const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(searchQuery)}`;
 
-    try {
       const response = await fetch(apiUrl);
       const data = await response.json();
 
-      const formattedResults =
-        data.items?.map((item) => ({
-          title: item.title,
-          snippet: item.snippet,
-          thumbnail:
-            item.pagemap?.cse_image?.[0]?.src ||
-            'https://via.placeholder.com/64',
-        })) || [];
+      const formattedResults = data.items?.map((item) => ({
+        title: item.title,
+        snippet: item.snippet,
+        thumbnail:
+          item.pagemap?.cse_image?.[0]?.src || 'https://via.placeholder.com/64',
+      })) || [];
 
       setResults(formattedResults);
       navigation.navigate('SearchResults', { results: formattedResults });
@@ -63,50 +62,33 @@ export default function HomeScreen() {
     }
   };
 
-  const handleVoiceSearch = () => {
-    Alert.alert('Coming Soon!', 'Voice search is being added in a future update.');
-  };
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Image
+        source={require('../../assets/mascot-search.png')}
+        style={styles.mascot}
+        resizeMode="contain"
+      />
 
-  try {
-    return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Image
-          source={require('../../assets/mascot-search.png')}
-          style={styles.mascot}
-          resizeMode="contain"
+      <Text style={styles.header}>Welcome to TUEBO! 🧠✨</Text>
+      <Text style={styles.subheader}>Safe Learning Search for Kids</Text>
+
+      <View style={styles.inputRow}>
+        <TextInput
+          placeholder="Type a question..."
+          placeholderTextColor="#aaa"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.input}
         />
-
-        <View style={styles.inputRow}>
-          <TextInput
-            placeholder="Type a question..."
-            placeholderTextColor="#aaa"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            style={styles.input}
-          />
-          <Button title="Search" onPress={handleSearch} />
-          <TouchableOpacity onPress={handleVoiceSearch} style={styles.micButton}>
-            <Image
-              source={require('../../assets/mic.png')}
-              style={styles.micIcon}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    );
-  } catch (error) {
-    console.error("HomeScreen error:", error);
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: 'red', fontSize: 18 }}>Oops! Something went wrong.</Text>
+        <Button title="Search" onPress={handleSearch} />
       </View>
-    );
-  }
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -122,7 +104,20 @@ const styles = StyleSheet.create({
   mascot: {
     width: 220,
     height: 220,
-    marginBottom: 30,
+    marginBottom: 20,
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  subheader: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 24,
+    textAlign: 'center',
   },
   inputRow: {
     flexDirection: 'row',
@@ -144,13 +139,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-  },
-  micButton: {
-    marginLeft: 8,
-    padding: 8,
-  },
-  micIcon: {
-    width: 24,
-    height: 24,
   },
 });
