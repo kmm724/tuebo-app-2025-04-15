@@ -10,10 +10,11 @@ import {
   Keyboard,
   Linking,
   Button,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_KEY = 'AIzaSyB84VMq1SlOqk2Ul3hL8jjtXW5nR54cRXo'; // Replace with your real key
+const API_KEY = 'AIzaSyB84VMq1SlOqk2Ul3hL8jjtXW5nR54cRXo';
 
 export default function VideoSearchScreen() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,10 +23,17 @@ export default function VideoSearchScreen() {
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
-    console.log('Running video search for:', searchQuery); // debug line
-
     try {
-      // Save search term to history
+      const blocked = await AsyncStorage.getItem('blockedTerms');
+      const blockedTerms = blocked ? JSON.parse(blocked) : [];
+      const loweredQuery = searchQuery.toLowerCase();
+      const isBlocked = blockedTerms.some(term => loweredQuery.includes(term));
+
+      if (isBlocked) {
+        Alert.alert('Blocked Search', 'This search contains a blocked keyword.');
+        return;
+      }
+
       const existing = await AsyncStorage.getItem('searchHistory');
       const parsed = existing ? JSON.parse(existing) : [];
       const newHistory = [{ term: searchQuery }, ...parsed].slice(0, 10);
@@ -71,7 +79,7 @@ export default function VideoSearchScreen() {
       console.error('Video search error', err);
       setVideos([]);
     } finally {
-      Keyboard.dismiss(); // moved here to prevent early dismissal
+      Keyboard.dismiss();
     }
   };
 
@@ -105,7 +113,13 @@ export default function VideoSearchScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: '#fff' },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color: '#e63946' },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#e63946',
+  },
   input: {
     borderColor: '#ccc',
     borderWidth: 1,
