@@ -99,7 +99,7 @@ export default function ParentToolsScreen() {
           secureTextEntry
           maxLength={4}
         />
-        <Button title="Unlock" onPress={handlePinSubmit} color="#f77f00" />
+        <Button title="Unlock" onPress={handlePinSubmit} color="#ff8800" />
       </View>
     );
   }
@@ -139,7 +139,7 @@ export default function ParentToolsScreen() {
               onChangeText={setNewBlockedTerm}
               placeholder="Add keyword to block"
             />
-            <Button title="Add" onPress={addBlockedTerm} color="#ff6b6b" />
+            <Button title="Add" onPress={addBlockedTerm} color="#e63946" />
           </View>
           {blockedTerms.length > 0 && (
             <FlatList
@@ -156,7 +156,7 @@ export default function ParentToolsScreen() {
       )}
 
       <View style={styles.logoutButtonWrapper}>
-        <Button title="🔒 Log Out" onPress={handleLogout} color="#e63946" />
+        <Button title="🔒 Log Out" onPress={handleLogout} color="#1d3557" />
       </View>
     </View>
   );
@@ -165,21 +165,21 @@ export default function ParentToolsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff3e6',
+    backgroundColor: '#f1faee',
     padding: 20,
     justifyContent: 'center',
   },
   header: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#f77f00',
+    color: '#1d3557',
     textAlign: 'center',
   },
   subHeader: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#444',
+    color: '#457b9d',
     marginVertical: 10,
     textAlign: 'center',
   },
@@ -206,14 +206,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   historyItem: {
-    backgroundColor: '#ffe5b4',
+    backgroundColor: '#a8dadc',
     padding: 10,
     marginBottom: 8,
     borderRadius: 8,
   },
   historyText: {
     fontSize: 16,
-    color: '#333',
+    color: '#1d3557',
   },
   empty: {
     fontSize: 16,
