@@ -1,55 +1,74 @@
 import React from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+} from 'react-native';
 
-const SearchResultsScreen = ({ route }) => {
-  const { results } = route.params;
+export default function SearchResultsScreen({ route }) {
+  const { results } = route.params || { results: [] };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
-      <Image source={{ uri: item.thumbnail }} style={styles.image} />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description} numberOfLines={2}>{item.snippet}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const validResults = results.filter(item => item.link && typeof item.link === 'string');
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={results}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.list}
-      />
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.header}>🔎 Results</Text>
+      {validResults.length === 0 ? (
+        <Text style={styles.empty}>No results found.</Text>
+      ) : (
+        validResults.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.card}
+            onPress={() => Linking.openURL(item.link)}
+          >
+            <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
+            <View style={styles.textContainer}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.snippet}>{item.snippet}</Text>
+            </View>
+          </TouchableOpacity>
+        ))
+      )}
+    </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#FFFDE6',
+    padding: 20,
+    backgroundColor: '#fffef6',
   },
-  list: {
-    padding: 16,
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1d3557',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  empty: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#888',
+    marginTop: 40,
   },
   card: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 12,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 3,
     flexDirection: 'row',
+    backgroundColor: '#e6f2ff',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 16,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#cce0ff',
   },
-  image: {
-    width: 64,
-    height: 64,
+  thumbnail: {
+    width: 80,
+    height: 80,
     borderRadius: 8,
     marginRight: 12,
   },
@@ -58,14 +77,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#1d3557',
+    marginBottom: 4,
+  },
+  snippet: {
+    fontSize: 14,
     color: '#444',
   },
-  description: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 4,
-  },
 });
-
-export default SearchResultsScreen;
