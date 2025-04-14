@@ -8,6 +8,8 @@ import {
   ScrollView,
   Keyboard,
   Image,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -61,6 +63,10 @@ export default function HomeScreen() {
     }
   };
 
+  const handleVoiceSearch = () => {
+    Alert.alert('Coming Soon!', 'Voice search is being added in a future update.');
+  };
+
   try {
     return (
       <ScrollView
@@ -83,6 +89,13 @@ export default function HomeScreen() {
             style={styles.input}
           />
           <Button title="Search" onPress={handleSearch} />
+          <TouchableOpacity onPress={handleVoiceSearch} style={styles.micButton}>
+            <Image
+              source={require('../../assets/mic.png')}
+              style={styles.micIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
         </View>
       </ScrollView>
     );
@@ -131,5 +144,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  micButton: {
+    marginLeft: 8,
+    padding: 8,
+  },
+  micIcon: {
+    width: 24,
+    height: 24,
   },
 });
