@@ -9,6 +9,7 @@ import {
   Keyboard,
   Image,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -48,8 +49,7 @@ export default function HomeScreen() {
       const formattedResults = data.items?.map((item) => ({
         title: item.title,
         snippet: item.snippet,
-        thumbnail:
-          item.pagemap?.cse_image?.[0]?.src || 'https://via.placeholder.com/64',
+        thumbnail: item.pagemap?.cse_image?.[0]?.src || 'https://via.placeholder.com/64',
       })) || [];
 
       setResults(formattedResults);
@@ -85,7 +85,14 @@ export default function HomeScreen() {
           onChangeText={setSearchQuery}
           style={styles.input}
         />
-        <Button title="Search" onPress={handleSearch} />
+        <Button title="Search" onPress={handleSearch} color="#1d3557" />
+        <TouchableOpacity onPress={() => Alert.alert('Voice search coming soon!')}>
+          <Image
+            source={require('../../assets/mic.png')}
+            style={styles.micIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -94,7 +101,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFDE6',
+    backgroundColor: '#ffe8d6',
   },
   content: {
     alignItems: 'center',
@@ -109,13 +116,13 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#2a9d8f',
     marginBottom: 6,
     textAlign: 'center',
   },
   subheader: {
     fontSize: 16,
-    color: '#666',
+    color: '#264653',
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -139,5 +146,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  micIcon: {
+    width: 36,
+    height: 36,
+    marginLeft: 6,
   },
 });
