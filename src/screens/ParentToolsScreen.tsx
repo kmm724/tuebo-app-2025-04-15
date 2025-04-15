@@ -17,6 +17,8 @@ export default function ParentToolsScreen() {
   const [blockedKeyword, setBlockedKeyword] = useState('');
   const [blockedKeywords, setBlockedKeywords] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
+  const [showBlocked, setShowBlocked] = useState(true);
+  const [showHistory, setShowHistory] = useState(true);
 
   const correctPin = '1234';
 
@@ -119,26 +121,43 @@ export default function ParentToolsScreen() {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={blockedKeywords}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => <Text style={styles.keyword}>{item}</Text>}
-        ListEmptyComponent={<Text style={styles.text}>No blocked keywords yet.</Text>}
-      />
-
-      <Text style={styles.label}>Search History:</Text>
-      <FlatList
-        data={searchHistory}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <Text style={styles.keyword}>{item.term || item}</Text>
-        )}
-        ListEmptyComponent={<Text style={styles.text}>No search history found.</Text>}
-      />
-
-      <TouchableOpacity style={[styles.button, { marginTop: 12 }]} onPress={clearSearchHistory}>
-        <Text style={styles.buttonText}>Clear Search History</Text>
+      <TouchableOpacity onPress={() => setShowBlocked(!showBlocked)}>
+        <Text style={styles.toggleHeader}>
+          {showBlocked ? '▼' : '▶'} Blocked Keywords ({blockedKeywords.length})
+        </Text>
       </TouchableOpacity>
+      {showBlocked && (
+        <FlatList
+          data={blockedKeywords}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <Text style={styles.keyword}>{item}</Text>}
+          ListEmptyComponent={<Text style={styles.text}>No blocked keywords yet.</Text>}
+        />
+      )}
+
+      <TouchableOpacity onPress={() => setShowHistory(!showHistory)}>
+        <Text style={styles.toggleHeader}>
+          {showHistory ? '▼' : '▶'} Search History ({searchHistory.length})
+        </Text>
+      </TouchableOpacity>
+      {showHistory && (
+        <>
+          <FlatList
+            data={searchHistory}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <Text style={styles.keyword}>{item.term || item}</Text>
+            )}
+            ListEmptyComponent={<Text style={styles.text}>No search history found.</Text>}
+          />
+          <TouchableOpacity
+            style={[styles.button, { marginTop: 12 }]}
+            onPress={clearSearchHistory}
+          >
+            <Text style={styles.buttonText}>Clear Search History</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 }
@@ -213,6 +232,13 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 6,
     width: '100%',
+    textAlign: 'center',
+  },
+  toggleHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1d3557',
+    marginVertical: 10,
     textAlign: 'center',
   },
 });
