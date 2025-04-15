@@ -12,11 +12,15 @@ import {
 export default function SearchResultsScreen({ route }) {
   const { results } = route.params || { results: [] };
 
-  const validResults = results.filter(item => item.link && typeof item.link === 'string');
+  // ✅ Prevent crash by ensuring results is an array
+  const validResults = Array.isArray(results)
+    ? results.filter(item => item.link && typeof item.link === 'string')
+    : [];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>🔎 Results</Text>
+      <Text style={styles.header}>Results</Text>
+
       {validResults.length === 0 ? (
         <Text style={styles.empty}>No results found.</Text>
       ) : (

@@ -75,7 +75,7 @@ export default function HomeScreen() {
           resizeMode="contain"
         />
 
-        <Text style={styles.header}>Welcome to TUEBO! 🧠✨</Text>
+        <Text style={styles.header}>Welcome to TUEBO! 🧑‍🧠✨</Text>
         <Text style={styles.subheader}>Safe Learning Search for Kids</Text>
 
         <View style={styles.inputRow}>
