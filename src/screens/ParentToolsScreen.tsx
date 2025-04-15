@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Keyboard,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ParentToolsScreen() {
   const [pinInput, setPinInput] = useState('');
@@ -19,12 +20,14 @@ export default function ParentToolsScreen() {
 
   const correctPin = '1234';
 
-  useEffect(() => {
-    if (unlocked) {
-      loadBlockedKeywords();
-      loadSearchHistory();
-    }
-  }, [unlocked]);
+  useFocusEffect(
+    useCallback(() => {
+      if (unlocked) {
+        loadBlockedKeywords();
+        loadSearchHistory();
+      }
+    }, [unlocked])
+  );
 
   const loadBlockedKeywords = async () => {
     try {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -17,8 +17,6 @@ const API_KEY = 'AIzaSyB84VMq1SlOqk2Ul3hL8jjtXW5nR54cRXo';
 const SEARCH_ENGINE_ID = 'f73c36ac849f74759';
 
 export default function HomeScreen() {
-  console.log("HomeScreen loaded successfully");
-
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -27,19 +25,12 @@ export default function HomeScreen() {
     if (!searchQuery.trim()) return;
 
     try {
-      const existing = await AsyncStorage.getItem('searchHistory');
-      const parsed = existing ? JSON.parse(existing) : [];
-      const newHistory = [{ term: searchQuery }, ...parsed].slice(0, 10);
-      await AsyncStorage.setItem('searchHistory', JSON.stringify(newHistory));
-    } catch (error) {
-      console.error('Failed to save search history:', error);
-    }
+      await saveSearchTerm(searchQuery);
 
-    const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(
-      searchQuery
-    )}`;
+      const apiUrl = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${SEARCH_ENGINE_ID}&q=${encodeURIComponent(
+        searchQuery
+      )}`;
 
-    try {
       const response = await fetch(apiUrl);
       const data = await response.json();
 
@@ -62,45 +53,50 @@ export default function HomeScreen() {
     }
   };
 
-  try {
-    return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Image
-          source={require('../../assets/mascot-search.png')}
-          style={styles.mascot}
-          resizeMode="contain"
+  const saveSearchTerm = async (query) => {
+    try {
+      const existing = await AsyncStorage.getItem('searchHistory');
+      const parsed = existing ? JSON.parse(existing) : [];
+      const updated = [
+        { term: query },
+        ...parsed.filter((item) => item.term !== query),
+      ].slice(0, 10);
+      await AsyncStorage.setItem('searchHistory', JSON.stringify(updated));
+    } catch (error) {
+      console.error('Failed to save search term:', error);
+    }
+  };
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Image
+        source={require('../../assets/mascot-search.png')}
+        style={styles.mascot}
+        resizeMode="contain"
+      />
+
+      <Text style={styles.header}>Welcome to TUEBO! 🧠✨</Text>
+      <Text style={styles.subheader}>Safe Learning Search for Kids</Text>
+
+      <View style={styles.inputRow}>
+        <TextInput
+          placeholder="Type a question..."
+          placeholderTextColor="#aaa"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.input}
         />
-
-        <Text style={styles.header}>Welcome to TUEBO! 🧑‍🧠✨</Text>
-        <Text style={styles.subheader}>Safe Learning Search for Kids</Text>
-
-        <View style={styles.inputRow}>
-          <TextInput
-            placeholder="Type a question..."
-            placeholderTextColor="#aaa"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            style={styles.input}
-          />
-          <Button title="Search" onPress={handleSearch} color="#1d3557" />
-          <TouchableOpacity onPress={() => console.log('Voice search tapped')}>
-            <Image source={require('../../assets/mic.png')} style={styles.micIcon} />
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    );
-  } catch (error) {
-    console.error("HomeScreen error:", error);
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: 'red', fontSize: 18 }}>Oops! Something went wrong.</Text>
+        <Button title="Search" onPress={handleSearch} color="#1d3557" />
+        <TouchableOpacity onPress={() => console.log('Voice search tapped')}>
+          <Image source={require('../../assets/mic.png')} style={styles.micIcon} />
+        </TouchableOpacity>
       </View>
-    );
-  }
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
