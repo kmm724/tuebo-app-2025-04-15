@@ -106,6 +106,9 @@ export default function ParentToolsScreen() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={[styles.button, { alignSelf: 'flex-end', marginBottom: 10 }]} onPress={() => setUnlocked(false)}>
+        <Text style={styles.buttonText}>Log Out</Text>
+      </TouchableOpacity>
       <Text style={styles.text}>🔓 PIN accepted. Parent Tools</Text>
 
       <Text style={styles.label}>Add a Blocked Keyword:</Text>
