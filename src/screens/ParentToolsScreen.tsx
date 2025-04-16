@@ -118,23 +118,7 @@ export default function ParentToolsScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.button, { alignSelf: 'flex-end', marginBottom: 10 }]}
-        onPress={() => setUnlocked(false)}
-      >
-        <Text style={styles.buttonText}>🔒 Log Out</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.text}>🔓 PIN accepted. Parent Tools</Text>
-
-      <TouchableOpacity
-        style={[styles.button, { marginBottom: 20 }]}
-        onPress={() => navigation.navigate('ParentInsights')}
-      >
-        <Text style={styles.buttonText}>📊 View Insights</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.label}>Add a Blocked Keyword:</Text>
+            <Text style={styles.label}>Add a Blocked Keyword:</Text>
       <View style={styles.inputRow}>
         <TextInput
           value={blockedKeyword}
@@ -147,8 +131,15 @@ export default function ParentToolsScreen() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => setShowBlocked(!showBlocked)}>
-        <Text style={styles.toggleHeader}>
+      <TouchableOpacity
+        style={[styles.button, { marginBottom: 20 }]}
+        onPress={() => navigation.navigate('ParentInsights')}
+      >
+        <Text style={styles.buttonText}>📊 View Insights</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={() => setShowBlocked(!showBlocked)}>
+        <Text style={styles.buttonText}>
           {showBlocked ? '▼' : '▶'} Blocked Keywords ({blockedKeywords.length})
         </Text>
       </TouchableOpacity>
@@ -167,8 +158,8 @@ export default function ParentToolsScreen() {
         />
       )}
 
-      <TouchableOpacity onPress={() => setShowHistory(!showHistory)}>
-        <Text style={styles.toggleHeader}>
+      <TouchableOpacity style={[styles.button, { marginTop: 20 }]} onPress={() => setShowHistory(!showHistory)}>
+        <Text style={styles.buttonText}>
           {showHistory ? '▼' : '▶'} Search History ({searchHistory.length})
         </Text>
       </TouchableOpacity>
@@ -190,6 +181,12 @@ export default function ParentToolsScreen() {
           </TouchableOpacity>
         </>
       )}
+
+      <View style={{ marginTop: 30, alignSelf: 'flex-end' }}>
+        <TouchableOpacity style={styles.button} onPress={() => setUnlocked(false)}>
+          <Text style={styles.buttonText}>🔒 Log Out</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
