@@ -9,6 +9,7 @@ import SearchResultsScreen from './src/screens/SearchResultsScreen';
 import VideoSearchScreen from './src/screens/VideoSearchScreen';
 import ParentToolsScreen from './src/screens/ParentToolsScreen';
 import ParentInsightsScreen from './src/screens/ParentInsightsScreen';
+import FunFactsScreen from './src/screens/FunFactsScreen';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
@@ -46,6 +47,8 @@ export default function App() {
               iconName = 'play-circle';
             } else if (route.name === 'Parent Tools') {
               iconName = 'settings';
+            } else if (route.name === 'Fun Facts') {
+              iconName = 'bulb';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -55,6 +58,7 @@ export default function App() {
         })}
       >
         <Tab.Screen name="Home" component={HomeStackScreen} />
+        <Tab.Screen name="Fun Facts" component={FunFactsScreen} />
         <Tab.Screen name="Videos" component={VideoSearchScreen} />
         <Tab.Screen name="Parent Tools" component={ParentStackScreen} />
       </Tab.Navigator>

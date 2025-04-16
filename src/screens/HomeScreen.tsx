@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import Voice from 'react-native-voice';
 
 const API_KEY = 'AIzaSyB84VMq1SlOqk2Ul3hL8jjtXW5nR54cRXo';
 const SEARCH_ENGINE_ID = 'f73c36ac849f74759';
@@ -28,6 +29,13 @@ export default function HomeScreen() {
       loadBlockedKeywords();
     }, [navigation])
   );
+
+  useEffect(() => {
+    Voice.onSpeechResults = onSpeechResults;
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
 
   const loadBlockedKeywords = async () => {
     try {
@@ -110,6 +118,23 @@ export default function HomeScreen() {
     }
   };
 
+  const startVoiceRecognition = async () => {
+    try {
+      await Voice.start('en-US');
+    } catch (e) {
+      console.error('Voice error:', e);
+      Alert.alert('Voice Error', 'Could not start voice recognition.');
+    }
+  };
+
+  const onSpeechResults = (event) => {
+    const spokenText = event.value[0];
+    if (spokenText) {
+      setSearchQuery(spokenText);
+      handleSearch();
+    }
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -134,7 +159,7 @@ export default function HomeScreen() {
           style={styles.input}
         />
         <Button title="Search" onPress={handleSearch} color="#1d3557" />
-        <TouchableOpacity onPress={() => console.log('Voice search tapped')}>
+        <TouchableOpacity onPress={startVoiceRecognition}>
           <Image source={require('../../assets/mic.png')} style={styles.micIcon} />
         </TouchableOpacity>
       </View>
