@@ -110,7 +110,7 @@ export default function ParentToolsScreen() {
           setUnlocked(false);
           setPinInput('');
         }}>
-        <Text style={styles.buttonText}>Log Out</Text>
+        <Text style={styles.buttonText}>🔒 Log Out</Text>
       </TouchableOpacity>
       <Text style={styles.text}>🔓 PIN accepted. Parent Tools</Text>
 
@@ -123,7 +123,7 @@ export default function ParentToolsScreen() {
           style={styles.input}
         />
         <TouchableOpacity style={styles.button} onPress={saveBlockedKeyword}>
-          <Text style={styles.buttonText}>Save</Text>
+          <Text style={styles.buttonText}>💾 Save</Text>
         </TouchableOpacity>
       </View>
 
@@ -160,7 +160,7 @@ export default function ParentToolsScreen() {
             style={[styles.button, { marginTop: 12 }]}
             onPress={clearSearchHistory}
           >
-            <Text style={styles.buttonText}>Clear Search History</Text>
+            <Text style={styles.buttonText}>🗑️ Clear Search History</Text>
           </TouchableOpacity>
         </>
       )}
