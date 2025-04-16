@@ -8,9 +8,11 @@ import HomeScreen from './src/screens/HomeScreen';
 import SearchResultsScreen from './src/screens/SearchResultsScreen';
 import VideoSearchScreen from './src/screens/VideoSearchScreen';
 import ParentToolsScreen from './src/screens/ParentToolsScreen';
+import ParentInsightsScreen from './src/screens/ParentInsightsScreen';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
+const ParentStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   return (
@@ -18,6 +20,15 @@ function HomeStackScreen() {
       <HomeStack.Screen name="HomeMain" component={HomeScreen} options={{ headerShown: false }} />
       <HomeStack.Screen name="SearchResults" component={SearchResultsScreen} options={{ title: 'Results' }} />
     </HomeStack.Navigator>
+  );
+}
+
+function ParentStackScreen() {
+  return (
+    <ParentStack.Navigator>
+      <ParentStack.Screen name="ParentToolsMain" component={ParentToolsScreen} options={{ headerShown: false }} />
+      <ParentStack.Screen name="ParentInsights" component={ParentInsightsScreen} options={{ title: 'Parent Insights' }} />
+    </ParentStack.Navigator>
   );
 }
 
@@ -45,7 +56,7 @@ export default function App() {
       >
         <Tab.Screen name="Home" component={HomeStackScreen} />
         <Tab.Screen name="Videos" component={VideoSearchScreen} />
-        <Tab.Screen name="Parent Tools" component={ParentToolsScreen} />
+        <Tab.Screen name="Parent Tools" component={ParentStackScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

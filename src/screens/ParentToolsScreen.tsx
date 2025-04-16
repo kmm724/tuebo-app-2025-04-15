@@ -1,4 +1,3 @@
-// ParentToolsScreen with remove blocked keyword functionality
 import React, { useState, useCallback } from 'react';
 import {
   View,
@@ -10,7 +9,7 @@ import {
   Keyboard,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 export default function ParentToolsScreen() {
   const [pinInput, setPinInput] = useState('');
@@ -20,6 +19,7 @@ export default function ParentToolsScreen() {
   const [searchHistory, setSearchHistory] = useState([]);
   const [showBlocked, setShowBlocked] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const navigation = useNavigation();
 
   const correctPin = '1234';
 
@@ -126,6 +126,13 @@ export default function ParentToolsScreen() {
       </TouchableOpacity>
 
       <Text style={styles.text}>🔓 PIN accepted. Parent Tools</Text>
+
+      <TouchableOpacity
+        style={[styles.button, { marginBottom: 20 }]}
+        onPress={() => navigation.navigate('ParentInsights')}
+      >
+        <Text style={styles.buttonText}>📊 View Insights</Text>
+      </TouchableOpacity>
 
       <Text style={styles.label}>Add a Blocked Keyword:</Text>
       <View style={styles.inputRow}>
