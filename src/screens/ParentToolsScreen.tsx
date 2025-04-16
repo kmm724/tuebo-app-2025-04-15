@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { LayoutAnimation, Platform, UIManager } from 'react-native';
 import {
   View,
   Text,
@@ -12,13 +13,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function ParentToolsScreen() {
+  if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
   const [pinInput, setPinInput] = useState('');
   const [unlocked, setUnlocked] = useState(false);
   const [blockedKeyword, setBlockedKeyword] = useState('');
   const [blockedKeywords, setBlockedKeywords] = useState([]);
   const [searchHistory, setSearchHistory] = useState([]);
-  const [showBlocked, setShowBlocked] = useState(true);
-  const [showHistory, setShowHistory] = useState(true);
+  const [showBlocked, setShowBlocked] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   const correctPin = '1234';
 
@@ -127,7 +131,10 @@ export default function ParentToolsScreen() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => setShowBlocked(!showBlocked)}>
+      <TouchableOpacity onPress={() => {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          setShowBlocked(!showBlocked);
+        }}>
         <Text style={styles.toggleHeader}>
           {showBlocked ? '▼' : '▶'} Blocked Keywords ({blockedKeywords.length})
         </Text>
@@ -141,7 +148,10 @@ export default function ParentToolsScreen() {
         />
       )}
 
-      <TouchableOpacity onPress={() => setShowHistory(!showHistory)}>
+      <TouchableOpacity onPress={() => {
+          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+          setShowHistory(!showHistory);
+        }}>
         <Text style={styles.toggleHeader}>
           {showHistory ? '▼' : '▶'} Search History ({searchHistory.length})
         </Text>
