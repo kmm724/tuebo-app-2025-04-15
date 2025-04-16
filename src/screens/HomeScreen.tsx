@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,10 @@ import {
   Keyboard,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const API_KEY = 'AIzaSyB84VMq1SlOqk2Ul3hL8jjtXW5nR54cRXo';
 const SEARCH_ENGINE_ID = 'f73c36ac849f74759';
@@ -20,9 +21,38 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
+  const [blockedKeywords, setBlockedKeywords] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadBlockedKeywords();
+    }, [navigation])
+  );
+
+  const loadBlockedKeywords = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('blockedKeywords');
+      const parsed = stored ? JSON.parse(stored) : [];
+      setBlockedKeywords(parsed);
+    } catch (error) {
+      console.error('Failed to load blocked keywords:', error);
+    }
+  };
 
   const handleSearch = async () => {
+    console.log('Starting search for:', searchQuery);
+    console.log('Blocked keywords list:', blockedKeywords);
     if (!searchQuery.trim()) return;
+
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    const containsBlocked = blockedKeywords.some((word) => lowerCaseQuery.includes(word));
+
+    if (containsBlocked) {
+      Alert.alert('Blocked Search', 'Oops! That word is not allowed.');
+      setSearchQuery('');
+      Keyboard.dismiss();
+      return;
+    }
 
     try {
       await saveSearchTerm(searchQuery);
@@ -31,8 +61,14 @@ export default function HomeScreen() {
         searchQuery
       )}`;
 
+      console.log('Fetching search results...');
       const response = await fetch(apiUrl);
       const data = await response.json();
+
+      if (!data.items || data.items.length === 0) {
+        Alert.alert('No Results', 'No search results found. Try something else.');
+        return;
+      }
 
       const formattedResults =
         data.items?.map((item) => ({

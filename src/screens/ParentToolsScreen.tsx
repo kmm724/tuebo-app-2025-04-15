@@ -1,5 +1,5 @@
+// ParentToolsScreen with remove blocked keyword functionality
 import React, { useState, useCallback } from 'react';
-import { LayoutAnimation, Platform, UIManager } from 'react-native';
 import {
   View,
   Text,
@@ -13,9 +13,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function ParentToolsScreen() {
-  if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-  }
   const [pinInput, setPinInput] = useState('');
   const [unlocked, setUnlocked] = useState(false);
   const [blockedKeyword, setBlockedKeyword] = useState('');
@@ -61,6 +58,16 @@ export default function ParentToolsScreen() {
     }
   };
 
+  const handleRemoveBlockedKeyword = async (wordToRemove) => {
+    const updated = blockedKeywords.filter(word => word !== wordToRemove);
+    setBlockedKeywords(updated);
+    try {
+      await AsyncStorage.setItem('blockedKeywords', JSON.stringify(updated));
+    } catch (error) {
+      console.error('Failed to remove keyword:', error);
+    }
+  };
+
   const loadSearchHistory = async () => {
     try {
       const stored = await AsyncStorage.getItem('searchHistory');
@@ -83,6 +90,7 @@ export default function ParentToolsScreen() {
   const handleUnlock = () => {
     if (pinInput === correctPin) {
       setUnlocked(true);
+      setPinInput('');
       Keyboard.dismiss();
     } else {
       alert('Incorrect PIN. Try again.');
@@ -102,7 +110,7 @@ export default function ParentToolsScreen() {
           style={styles.pinInput}
         />
         <TouchableOpacity style={styles.button} onPress={handleUnlock}>
-          <Text style={styles.buttonText}>Unlock</Text>
+          <Text style={styles.buttonText}>🔓 Unlock</Text>
         </TouchableOpacity>
       </View>
     );
@@ -110,12 +118,13 @@ export default function ParentToolsScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={[styles.button, { alignSelf: 'flex-end', marginBottom: 10 }]} onPress={() => {
-          setUnlocked(false);
-          setPinInput('');
-        }}>
+      <TouchableOpacity
+        style={[styles.button, { alignSelf: 'flex-end', marginBottom: 10 }]}
+        onPress={() => setUnlocked(false)}
+      >
         <Text style={styles.buttonText}>🔒 Log Out</Text>
       </TouchableOpacity>
+
       <Text style={styles.text}>🔓 PIN accepted. Parent Tools</Text>
 
       <Text style={styles.label}>Add a Blocked Keyword:</Text>
@@ -131,10 +140,7 @@ export default function ParentToolsScreen() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => {
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setShowBlocked(!showBlocked);
-        }}>
+      <TouchableOpacity onPress={() => setShowBlocked(!showBlocked)}>
         <Text style={styles.toggleHeader}>
           {showBlocked ? '▼' : '▶'} Blocked Keywords ({blockedKeywords.length})
         </Text>
@@ -143,15 +149,18 @@ export default function ParentToolsScreen() {
         <FlatList
           data={blockedKeywords}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => <Text style={styles.keyword}>{item}</Text>}
-          ListEmptyComponent={<Text style={styles.text}>No blocked keywords yet.</Text>}
+          renderItem={({ item }) => (
+            <View style={styles.keywordRow}>
+              <Text style={styles.keyword}>{item}</Text>
+              <TouchableOpacity onPress={() => handleRemoveBlockedKeyword(item)}>
+                <Text style={styles.removeText}>❌</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         />
       )}
 
-      <TouchableOpacity onPress={() => {
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-          setShowHistory(!showHistory);
-        }}>
+      <TouchableOpacity onPress={() => setShowHistory(!showHistory)}>
         <Text style={styles.toggleHeader}>
           {showHistory ? '▼' : '▶'} Search History ({searchHistory.length})
         </Text>
@@ -247,8 +256,20 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 6,
     marginBottom: 6,
-    width: '100%',
     textAlign: 'center',
+    flex: 1,
+  },
+  keywordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 6,
+  },
+  removeText: {
+    fontSize: 16,
+    color: 'red',
+    paddingHorizontal: 12,
   },
   toggleHeader: {
     fontSize: 18,
