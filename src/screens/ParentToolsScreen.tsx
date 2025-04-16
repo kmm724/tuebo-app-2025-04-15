@@ -16,9 +16,7 @@ export default function ParentToolsScreen() {
   const [unlocked, setUnlocked] = useState(false);
   const [blockedKeyword, setBlockedKeyword] = useState('');
   const [blockedKeywords, setBlockedKeywords] = useState([]);
-  const [searchHistory, setSearchHistory] = useState([]);
   const [showBlocked, setShowBlocked] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
   const navigation = useNavigation();
 
   const correctPin = '1234';
@@ -27,7 +25,6 @@ export default function ParentToolsScreen() {
     useCallback(() => {
       if (unlocked) {
         loadBlockedKeywords();
-        loadSearchHistory();
       }
     }, [unlocked])
   );
@@ -68,25 +65,6 @@ export default function ParentToolsScreen() {
     }
   };
 
-  const loadSearchHistory = async () => {
-    try {
-      const stored = await AsyncStorage.getItem('searchHistory');
-      const parsed = stored ? JSON.parse(stored) : [];
-      setSearchHistory(parsed);
-    } catch (error) {
-      console.error('Failed to load search history:', error);
-    }
-  };
-
-  const clearSearchHistory = async () => {
-    try {
-      await AsyncStorage.removeItem('searchHistory');
-      setSearchHistory([]);
-    } catch (error) {
-      console.error('Failed to clear search history:', error);
-    }
-  };
-
   const handleUnlock = () => {
     if (pinInput === correctPin) {
       setUnlocked(true);
@@ -118,7 +96,7 @@ export default function ParentToolsScreen() {
 
   return (
     <View style={styles.container}>
-            <Text style={styles.label}>Add a Blocked Keyword:</Text>
+      <Text style={styles.label}>Add a Blocked Keyword:</Text>
       <View style={styles.inputRow}>
         <TextInput
           value={blockedKeyword}
@@ -143,6 +121,7 @@ export default function ParentToolsScreen() {
           {showBlocked ? '▼' : '▶'} Blocked Keywords ({blockedKeywords.length})
         </Text>
       </TouchableOpacity>
+
       {showBlocked && (
         <FlatList
           data={blockedKeywords}
@@ -158,35 +137,12 @@ export default function ParentToolsScreen() {
         />
       )}
 
-      <TouchableOpacity style={[styles.button, { marginTop: 20 }]} onPress={() => setShowHistory(!showHistory)}>
-        <Text style={styles.buttonText}>
-          {showHistory ? '▼' : '▶'} Search History ({searchHistory.length})
-        </Text>
+      <TouchableOpacity
+        style={[styles.button, { marginTop: 30 }]}
+        onPress={() => setUnlocked(false)}
+      >
+        <Text style={styles.buttonText}>🔒 Log Out</Text>
       </TouchableOpacity>
-      {showHistory && (
-        <>
-          <FlatList
-            data={searchHistory}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <Text style={styles.keyword}>{item.term || item}</Text>
-            )}
-            ListEmptyComponent={<Text style={styles.text}>No search history found.</Text>}
-          />
-          <TouchableOpacity
-            style={[styles.button, { marginTop: 12 }]}
-            onPress={clearSearchHistory}
-          >
-            <Text style={styles.buttonText}>🗑️ Clear Search History</Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-      <View style={{ marginTop: 30, alignSelf: 'flex-end' }}>
-        <TouchableOpacity style={styles.button} onPress={() => setUnlocked(false)}>
-          <Text style={styles.buttonText}>🔒 Log Out</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -249,11 +205,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  text: {
-    fontSize: 18,
-    color: '#333',
-    textAlign: 'center',
-  },
   keyword: {
     fontSize: 16,
     backgroundColor: '#e0f0ff',
@@ -274,22 +225,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'red',
     paddingHorizontal: 12,
-  },
-  toggleHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1d3557',
-    marginVertical: 10,
-    textAlign: 'center',
-    backgroundColor: '#dfefff',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
   },
 });
