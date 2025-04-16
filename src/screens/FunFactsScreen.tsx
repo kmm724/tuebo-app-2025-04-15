@@ -1,84 +1,93 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import * as Speech from 'expo-speech';
+import React from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/navigation';
 
-const funFacts = [
-  { text: 'Octopuses have three hearts and blue blood!', emoji: '🐙' },
-  { text: 'Bananas are berries, but strawberries are not!', emoji: '🍌' },
-  { text: 'A day on Venus is longer than a year on Venus!', emoji: '🪐' },
-  { text: 'Elephants can recognize themselves in mirrors!', emoji: '🐘' },
-  { text: 'Honey never spoils — archaeologists found 3,000-year-old honey!', emoji: '🍯' },
-  { text: 'A bolt of lightning is five times hotter than the sun.', emoji: '⚡' },
-  { text: 'Sloths can hold their breath longer than dolphins can.', emoji: '🦥' },
-  { text: 'Sharks existed before trees.', emoji: '🦈' },
-  { text: 'Some turtles can breathe through their butts!', emoji: '🐢' },
-  { text: 'There are more stars in space than grains of sand on Earth.', emoji: '🌌' },
-  { text: 'Sea otters hold hands when they sleep so they don’t drift apart.', emoji: '🦦' },
-  { text: 'The Eiffel Tower can grow over 6 inches during hot days.', emoji: '🗼' }
+type FunFact = {
+  id: string;
+  emoji: string;
+  fact: string;
+  topic: string;
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'FunFactsMain'>;
+
+const funFacts: FunFact[] = [
+  { id: '1', emoji: '🚀', fact: 'A rocket can travel at speeds over 17,000 mph!', topic: 'rockets' },
+  { id: '2', emoji: '🐘', fact: 'Elephants can recognize themselves in a mirror!', topic: 'elephants' },
+  { id: '3', emoji: '🌋', fact: 'Some volcanoes can shoot lava over 1,000 feet in the air!', topic: 'volcanoes' },
+  { id: '4', emoji: '🦈', fact: 'Sharks have been around longer than dinosaurs!', topic: 'sharks' },
+  { id: '5', emoji: '🧠', fact: 'Your brain uses more energy than any other organ!', topic: 'brain' },
+  { id: '6', emoji: '🐝', fact: 'Bees communicate by dancing!', topic: 'bees' },
+  { id: '7', emoji: '🦕', fact: 'Some dinosaurs had feathers!', topic: 'dinosaurs' },
+  { id: '8', emoji: '🛰️', fact: 'Satellites orbit Earth at thousands of miles per hour!', topic: 'satellites' },
+  { id: '9', emoji: '🧊', fact: 'Antarctica is the driest, coldest, and windiest place on Earth!', topic: 'antarctica' },
+  { id: '10', emoji: '🌌', fact: 'The Milky Way galaxy is over 100,000 light-years wide!', topic: 'milky way' },
+  { id: '11', emoji: '🦉', fact: 'Owls can rotate their heads up to 270 degrees!', topic: 'owls' },
+  { id: '12', emoji: '🌱', fact: 'Plants can "talk" to each other using chemicals!', topic: 'plants' },
+  { id: '13', emoji: '🐙', fact: 'An octopus has three hearts and blue blood!', topic: 'octopus' },
+  { id: '14', emoji: '🚂', fact: 'Trains once ran on steam from burning coal or wood!', topic: 'trains' },
+  { id: '15', emoji: '🦋', fact: 'Butterflies taste with their feet!', topic: 'butterflies' },
+  { id: '16', emoji: '🐧', fact: 'Penguins can drink salty seawater!', topic: 'penguins' },
+  { id: '17', emoji: '⚡', fact: 'Lightning is five times hotter than the surface of the sun!', topic: 'lightning' },
+  { id: '18', emoji: '🐢', fact: 'Some turtles can live over 100 years!', topic: 'turtles' },
+  { id: '19', emoji: '🧪', fact: 'Slime is a non-Newtonian fluid—it’s both liquid and solid!', topic: 'slime' },
+  { id: '20', emoji: '🎈', fact: 'The first hot air balloon flight carried a duck, a sheep, and a rooster!', topic: 'hot air balloons' },
 ];
 
-export default function FunFactsScreen() {
-  const [fact, setFact] = useState(funFacts[0]);
+const FunFactsScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp>();
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const handlePress = (topic: string, fact: string) => {
+    navigation.navigate('FactVideoScreen', { topic, fact });
+  };
 
-const getRandomFact = () => {
-  const nextIndex = (currentIndex + 1) % funFacts.length;
-  setCurrentIndex(nextIndex);
-  const nextFact = funFacts[nextIndex];
-  setFact(nextFact);
-  Speech.speak(nextFact.text);
-};
+  const renderItem = ({ item }: { item: FunFact }) => (
+    <View style={styles.factCard}>
+      <TouchableOpacity onPress={() => handlePress(item.topic, item.fact)}>
+        <Text style={styles.emoji}>{item.emoji}</Text>
+      </TouchableOpacity>
+      <Text style={styles.factText}>{item.fact}</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🧠 Did You Know?</Text>
-
-      <Text style={styles.emoji}>{fact.emoji}</Text>
-      <Text style={styles.fact}>{fact.text}</Text>
-
-      <TouchableOpacity style={styles.button} onPress={getRandomFact}>
-        <Text style={styles.buttonText}>✨ Surprise Me Again!</Text>
-      </TouchableOpacity>
+      <FlatList
+        data={funFacts}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.list}
+      />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fdf6e4',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    padding: 16,
+    backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1d3557',
-    marginBottom: 20,
-    textAlign: 'center',
+  list: {
+    paddingBottom: 16,
+  },
+  factCard: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    alignItems: 'center',
   },
   emoji: {
-    fontSize: 64,
-    marginBottom: 16,
+    fontSize: 36,
+    marginBottom: 8,
   },
-  fact: {
-    fontSize: 20,
-    color: '#333',
+  factText: {
+    fontSize: 16,
     textAlign: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 10,
-  },
-  button: {
-    backgroundColor: '#457b9d',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 25,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
 });
+
+export default FunFactsScreen;

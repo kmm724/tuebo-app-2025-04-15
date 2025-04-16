@@ -10,10 +10,12 @@ import VideoSearchScreen from './src/screens/VideoSearchScreen';
 import ParentToolsScreen from './src/screens/ParentToolsScreen';
 import ParentInsightsScreen from './src/screens/ParentInsightsScreen';
 import FunFactsScreen from './src/screens/FunFactsScreen';
+import FactVideoScreen from './src/screens/FactVideoScreen';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 const ParentStack = createNativeStackNavigator();
+const FunFactsStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   return (
@@ -30,6 +32,23 @@ function ParentStackScreen() {
       <ParentStack.Screen name="ParentToolsMain" component={ParentToolsScreen} options={{ headerShown: false }} />
       <ParentStack.Screen name="ParentInsights" component={ParentInsightsScreen} options={{ title: 'Parent Insights' }} />
     </ParentStack.Navigator>
+  );
+}
+
+function FunFactsStackScreen() {
+  return (
+    <FunFactsStack.Navigator>
+      <FunFactsStack.Screen
+        name="FunFactsMain"
+        component={FunFactsScreen}
+        options={{ headerShown: false }}
+      />
+      <FunFactsStack.Screen
+        name="FactVideoScreen"
+        component={FactVideoScreen}
+        options={{ title: 'More About This!' }}
+      />
+    </FunFactsStack.Navigator>
   );
 }
 
@@ -58,7 +77,7 @@ export default function App() {
         })}
       >
         <Tab.Screen name="Home" component={HomeStackScreen} />
-        <Tab.Screen name="Fun Facts" component={FunFactsScreen} />
+        <Tab.Screen name="Fun Facts" component={FunFactsStackScreen} />
         <Tab.Screen name="Videos" component={VideoSearchScreen} />
         <Tab.Screen name="Parent Tools" component={ParentStackScreen} />
       </Tab.Navigator>
