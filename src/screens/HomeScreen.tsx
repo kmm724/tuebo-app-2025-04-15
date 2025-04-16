@@ -40,12 +40,12 @@ export default function HomeScreen() {
   };
 
   const handleSearch = async () => {
-    console.log('Starting search for:', searchQuery);
-    console.log('Blocked keywords list:', blockedKeywords);
     if (!searchQuery.trim()) return;
 
     const lowerCaseQuery = searchQuery.toLowerCase();
-    const containsBlocked = blockedKeywords.some((word) => lowerCaseQuery.includes(word));
+    const containsBlocked = blockedKeywords.some((word) =>
+      lowerCaseQuery.includes(word)
+    );
 
     if (containsBlocked) {
       Alert.alert('Blocked Search', 'Oops! That word is not allowed.');
@@ -61,14 +61,8 @@ export default function HomeScreen() {
         searchQuery
       )}`;
 
-      console.log('Fetching search results...');
       const response = await fetch(apiUrl);
       const data = await response.json();
-
-      if (!data.items || data.items.length === 0) {
-        Alert.alert('No Results', 'No search results found. Try something else.');
-        return;
-      }
 
       const formattedResults =
         data.items?.map((item) => ({
@@ -79,8 +73,21 @@ export default function HomeScreen() {
           link: item.link,
         })) || [];
 
-      setResults(formattedResults);
-      navigation.navigate('SearchResults', { results: formattedResults });
+      const cleanResults = formattedResults.filter(
+        (item) =>
+          !blockedKeywords.some((word) =>
+            item.title.toLowerCase().includes(word) ||
+            item.snippet.toLowerCase().includes(word)
+          )
+      );
+
+      if (cleanResults.length === 0) {
+        Alert.alert('Content Filtered', 'No safe results found. Try another search.');
+        return;
+      }
+
+      setResults(cleanResults);
+      navigation.navigate('SearchResults', { results: cleanResults });
       setSearchQuery('');
     } catch (error) {
       console.error('Search error:', error);
