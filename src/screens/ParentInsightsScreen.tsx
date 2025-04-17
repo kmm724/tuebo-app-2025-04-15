@@ -1,66 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
-export default function ParentInsightsScreen() {
-  const [searchHistory, setSearchHistory] = useState([]);
-
-  useEffect(() => {
-    loadSearchHistory();
-  }, []);
-
-  const loadSearchHistory = async () => {
-    try {
-      const stored = await AsyncStorage.getItem('searchHistory');
-      const parsed = stored ? JSON.parse(stored) : [];
-      setSearchHistory(parsed);
-    } catch (error) {
-      console.error('Failed to load search history:', error);
-    }
-  };
+const ParentInsightsScreen: React.FC = () => {
+  // Dummy data for now — we’ll make this dynamic soon
+  const recentTopics = ['volcanoes', 'sharks', 'dinosaurs'];
+  const mostPlayed = 'penguins';
+  const timeSpentToday = 18; // in minutes
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>📊 Parent Insights</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.heading}>Parent Insights</Text>
 
-      <Text style={styles.sectionTitle}>Recent Searches:</Text>
-      <FlatList
-        data={searchHistory}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <Text style={styles.item}>🔎 {item.term || item}</Text>
-        )}
-        ListEmptyComponent={<Text style={styles.item}>No searches found.</Text>}
-      />
-    </View>
+      <View style={styles.card}>
+        <Text style={styles.title}>🕵️‍♀️ Recent Topics Explored</Text>
+        {recentTopics.map((topic, index) => (
+          <Text key={index} style={styles.detail}>• {topic}</Text>
+        ))}
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.title}>💬 Most Played Fun Fact</Text>
+        <Text style={styles.detail}>{mostPlayed}</Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.title}>⏱ Time Spent Today</Text>
+        <Text style={styles.detail}>{timeSpentToday} minutes</Text>
+      </View>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fffaf0',
-    padding: 24,
+    padding: 20,
+    backgroundColor: '#fefefe',
   },
-  header: {
-    fontSize: 26,
+  heading: {
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 24,
     textAlign: 'center',
     color: '#1d3557',
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  card: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
   },
-  item: {
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  detail: {
     fontSize: 16,
-    paddingVertical: 6,
+    marginBottom: 4,
   },
 });
+
+export default ParentInsightsScreen;
