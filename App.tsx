@@ -76,7 +76,19 @@ export default function App() {
           tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tab.Screen name="Home" component={HomeStackScreen} />
+        <Tab.Screen
+          name="Home"
+          component={HomeStackScreen}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Home' }],
+              });
+            },
+          })}
+        />
         <Tab.Screen name="Fun Facts" component={FunFactsStackScreen} />
         <Tab.Screen name="Videos" component={VideoSearchScreen} />
         <Tab.Screen name="Parent Tools" component={ParentStackScreen} />
