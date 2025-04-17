@@ -1,11 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ParentInsightsScreen: React.FC = () => {
-  // Dummy data for now — we’ll make this dynamic soon
-  const recentTopics = ['volcanoes', 'sharks', 'dinosaurs'];
-  const mostPlayed = 'penguins';
-  const timeSpentToday = 18; // in minutes
+  const [recentTopics, setRecentTopics] = useState<string[]>([]);
+  const [mostPlayed, setMostPlayed] = useState<string | null>(null);
+  const [timeSpentToday, setTimeSpentToday] = useState<number>(0);
+
+  useEffect(() => {
+    const loadInsights = async () => {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+
+        const storedTopics = await AsyncStorage.getItem('recentTopics');
+        if (storedTopics) {
+          setRecentTopics(JSON.parse(storedTopics));
+        }
+
+        const storedCounts = await AsyncStorage.getItem('funFactCounts');
+        if (storedCounts) {
+          const counts = JSON.parse(storedCounts);
+          const sortedTopics = Object.entries(counts)
+            .sort((a, b) => b[1] - a[1]);
+
+          if (sortedTopics.length > 0) {
+            setMostPlayed(sortedTopics[0][0]);
+          }
+        }
+
+        const timeKey = `timeSpent-${today}`;
+        const storedTime = await AsyncStorage.getItem(timeKey);
+        const parsedTime = storedTime ? parseInt(storedTime, 10) : 0;
+        setTimeSpentToday(parsedTime);
+
+      } catch (error) {
+        console.error('Failed to load insights:', error);
+      }
+    };
+
+    loadInsights();
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -13,19 +47,27 @@ const ParentInsightsScreen: React.FC = () => {
 
       <View style={styles.card}>
         <Text style={styles.title}>🕵️‍♀️ Recent Topics Explored</Text>
-        {recentTopics.map((topic, index) => (
-          <Text key={index} style={styles.detail}>• {topic}</Text>
-        ))}
+        {recentTopics.length > 0 ? (
+          recentTopics.map((topic, index) => (
+            <Text key={index} style={styles.detail}>• {topic}</Text>
+          ))
+        ) : (
+          <Text style={styles.detail}>No activity tracked yet.</Text>
+        )}
       </View>
 
       <View style={styles.card}>
         <Text style={styles.title}>💬 Most Played Fun Fact</Text>
-        <Text style={styles.detail}>{mostPlayed}</Text>
+        <Text style={styles.detail}>
+          {mostPlayed ? mostPlayed : 'No data yet'}
+        </Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.title}>⏱ Time Spent Today</Text>
-        <Text style={styles.detail}>{timeSpentToday} minutes</Text>
+        <Text style={styles.detail}>
+          {timeSpentToday} minute{timeSpentToday === 1 ? '' : 's'}
+        </Text>
       </View>
     </ScrollView>
   );

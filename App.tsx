@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HomeScreen from './src/screens/HomeScreen';
 import SearchResultsScreen from './src/screens/SearchResultsScreen';
@@ -52,7 +54,58 @@ function FunFactsStackScreen() {
   );
 }
 
-export default function App() {
+function App() {
+  const appState = useRef(AppState.currentState);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const updateTimeSpent = async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const key = `timeSpent-${today}`;
+      const stored = await AsyncStorage.getItem(key);
+      const minutes = stored ? parseInt(stored, 10) : 0;
+      await AsyncStorage.setItem(key, (minutes + 1).toString());
+      console.log(`Updated time for ${key}: ${minutes + 1} minute(s)`);
+    };
+
+    const startTimer = () => {
+      if (!intervalRef.current) {
+        console.log('⏱ Starting timer...');
+        intervalRef.current = setInterval(updateTimeSpent, 60000);
+      }
+    };
+
+    const stopTimer = () => {
+      if (intervalRef.current) {
+        console.log('⏹ Stopping timer...');
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      console.log(`🔄 AppState changed: ${appState.current} → ${nextAppState}`);
+      if (nextAppState === 'active') {
+        startTimer();
+      } else {
+        stopTimer();
+      }
+      appState.current = nextAppState;
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    setTimeout(() => {
+      console.log('👀 Forcing timer to start after load...');
+      startTimer();
+    }, 1000);
+
+    return () => {
+      subscription.remove();
+      stopTimer();
+    };
+  }, []);
+
   return (
     <NavigationContainer>
       <Tab.Navigator
@@ -96,3 +149,5 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+export default App;

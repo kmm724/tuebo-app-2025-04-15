@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../types/navigation';
 
 type FunFact = {
@@ -14,32 +15,35 @@ type FunFact = {
 type NavigationProp = StackNavigationProp<RootStackParamList, 'FunFactsMain'>;
 
 const funFacts: FunFact[] = [
-  { id: '1', emoji: '🚀', fact: 'A rocket can travel at speeds over 17,000 mph!', topic: 'rockets' },
-  { id: '2', emoji: '🐘', fact: 'Elephants can recognize themselves in a mirror!', topic: 'elephants' },
-  { id: '3', emoji: '🌋', fact: 'Some volcanoes can shoot lava over 1,000 feet in the air!', topic: 'volcanoes' },
-  { id: '4', emoji: '🦈', fact: 'Sharks have been around longer than dinosaurs!', topic: 'sharks' },
-  { id: '5', emoji: '🧠', fact: 'Your brain uses more energy than any other organ!', topic: 'brain' },
-  { id: '6', emoji: '🐝', fact: 'Bees communicate by dancing!', topic: 'bees' },
-  { id: '7', emoji: '🦕', fact: 'Some dinosaurs had feathers!', topic: 'dinosaurs' },
-  { id: '8', emoji: '🛰️', fact: 'Satellites orbit Earth at thousands of miles per hour!', topic: 'satellites' },
-  { id: '9', emoji: '🧊', fact: 'Antarctica is the driest, coldest, and windiest place on Earth!', topic: 'antarctica' },
-  { id: '10', emoji: '🌌', fact: 'The Milky Way galaxy is over 100,000 light-years wide!', topic: 'milky way' },
-  { id: '11', emoji: '🦉', fact: 'Owls can rotate their heads up to 270 degrees!', topic: 'owls' },
-  { id: '12', emoji: '🌱', fact: 'Plants can "talk" to each other using chemicals!', topic: 'plants' },
-  { id: '13', emoji: '🐙', fact: 'An octopus has three hearts and blue blood!', topic: 'octopus' },
-  { id: '14', emoji: '🚂', fact: 'Trains once ran on steam from burning coal or wood!', topic: 'trains' },
-  { id: '15', emoji: '🦋', fact: 'Butterflies taste with their feet!', topic: 'butterflies' },
-  { id: '16', emoji: '🐧', fact: 'Penguins can drink salty seawater!', topic: 'penguins' },
-  { id: '17', emoji: '⚡', fact: 'Lightning is five times hotter than the surface of the sun!', topic: 'lightning' },
-  { id: '18', emoji: '🐢', fact: 'Some turtles can live over 100 years!', topic: 'turtles' },
-  { id: '19', emoji: '🧪', fact: 'Slime is a non-Newtonian fluid—it’s both liquid and solid!', topic: 'slime' },
-  { id: '20', emoji: '🎈', fact: 'The first hot air balloon flight carried a duck, a sheep, and a rooster!', topic: 'hot air balloons' },
+  { id: '1', emoji: '🐝', fact: 'Bees communicate by dancing!', topic: 'bees' },
+  { id: '2', emoji: '🦈', fact: 'Sharks have been around longer than dinosaurs!', topic: 'sharks' },
+  { id: '3', emoji: '🧠', fact: 'Your brain uses more energy than any other organ!', topic: 'brain' },
+  // Add more if needed
 ];
 
 const FunFactsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
 
-  const handlePress = (topic: string, fact: string) => {
+  const handlePress = async (topic: string, fact: string) => {
+    try {
+      // Track recent topics
+      const recent = await AsyncStorage.getItem('recentTopics');
+      let recentList = recent ? JSON.parse(recent) : [];
+      recentList.unshift(topic);
+      recentList = [...new Set(recentList)].slice(0, 10);
+      await AsyncStorage.setItem('recentTopics', JSON.stringify(recentList));
+
+      // Track tap counts
+      const counts = await AsyncStorage.getItem('funFactCounts');
+      let countMap = counts ? JSON.parse(counts) : {};
+      countMap[topic] = (countMap[topic] || 0) + 1;
+
+      console.log(`🔢 Updated count for "${topic}": ${countMap[topic]}`);
+      await AsyncStorage.setItem('funFactCounts', JSON.stringify(countMap));
+    } catch (error) {
+      console.error('❌ Failed to update tracking data:', error);
+    }
+
     navigation.navigate('FactVideoScreen', { topic, fact });
   };
 
